@@ -1,0 +1,99 @@
+
+CREATE TABLE 제품
+(제품번호 CHAR(3)     NOT NULL
+,설명 VARCHAR(255)    NOT NULL
+,가격   INT
+,재고량 INT
+,PRIMARY KEY(제품번호)
+);
+
+CREATE TABLE 고객
+(고객번호 CHAR(4)     NOT NULL
+,이름 VARCHAR(20)    NOT NULL
+,주소 VARCHAR(50)
+,PRIMARY KEY(고객번호)
+);
+
+CREATE TABLE 주문
+(주문번호 CHAR(5)     NOT NULL
+,납기일 DATE    NOT NULL
+,담당자 VARCHAR(20)
+,계약조건 VARCHAR(50)
+,고객번호 CHAR(4)
+,PRIMARY KEY(주문번호)
+,FOREIGN KEY(고객번호) REFERENCES 고객(고객번호)
+);
+
+CREATE TABLE 주문내역
+(제품번호 CHAR(3)	NOT NULL
+,주문번호 CHAR(5)	NOT NULL
+,수량 INT CHECK (수량>0)
+,PRIMARY KEY(제품번호,주문번호)
+,FOREIGN KEY(제품번호) REFERENCES 제품(제품번호)
+,FOREIGN KEY(주문번호) REFERENCES 주문(주문번호)
+);
+
+INSERT INTO 제품 VALUES ('101','오렌지',1000,500);
+INSERT INTO 제품 VALUES ('102','복숭아',2000,250);
+INSERT INTO 제품 VALUES ('103','수박',5000,50);
+INSERT INTO 제품 VALUES ('104','레몬',2000,200);
+
+INSERT INTO 고객 (고객번호,이름,주소) VALUES ('c101','최미선','인천');
+INSERT INTO 고객 (고객번호,이름,주소) VALUES ('c102','이수경','서울');
+INSERT INTO 고객 (고객번호,이름,주소) VALUES ('c103','유인나','');
+INSERT INTO 고객 (고객번호,이름,주소) VALUES ('c104','아이유','서울');
+
+INSERT INTO 주문 (주문번호,납기일,고객번호) VALUES ('o1001','2017-07-10','c101');
+INSERT INTO 주문 (주문번호,납기일,고객번호) VALUES ('o1002','2017-07-17','c102');
+INSERT INTO 주문 (주문번호,납기일,고객번호) VALUES ('o1003','2017-07-17','c102');
+INSERT INTO 주문 (주문번호,납기일,고객번호) VALUES ('o1004','2017-08-15','c104');
+INSERT INTO 주문 (주문번호,납기일,고객번호) VALUES ('o1005','2017-08-15','c101');
+INSERT INTO 주문 (주문번호,납기일,고객번호) VALUES ('o1006','2017-08-25','c101');
+
+INSERT INTO 주문내역 VALUES ('101','o1001',10);
+INSERT INTO 주문내역 VALUES ('102','o1002',100);
+INSERT INTO 주문내역 VALUES ('103','o1002',50);
+INSERT INTO 주문내역 VALUES ('101','o1003',50);
+INSERT INTO 주문내역 VALUES ('102','o1003',1);
+INSERT INTO 주문내역 VALUES ('104','o1003',30);
+INSERT INTO 주문내역 VALUES ('101','o1004',200);
+INSERT INTO 주문내역 VALUES ('102','o1005',1);
+INSERT INTO 주문내역 VALUES ('104','o1006',80);
+
+--1. 제품 목록 데이터를 검색하는 SQL문을 작성하라.
+SELECT * FROM 제품;
+
+--2. 성이 '유'로 시작하는 고객 목록 데이터를 검색하는 SQL문을 작성하라
+SELECT * FROM 고객 WHERE 이름 LIKE '유%';
+
+--3. 고객 이름에'이'가 들어가는 고객 목록 데이터를 검색하는 SQL문을 작성하라.
+SELECT * FROM 고객 WHERE 이름 LIKE '%이%';
+
+--4. 고객목록 이름을 기준으로 가나다순으로 정렬하여 출력하는 SQL문을 작성하라.
+SELECT * FROM 고객 ORDER BY 이름 ASC;
+
+--5. 고객 수를 검색하는 SQL문을 작성하라.
+SELECT COUNT (*) FROM 고객;
+
+--6. 제품의 최소 재고량을 검색하는 SQL문을 작성하라.
+SELECT MIN (재고량) FROM 제품;
+
+--7. 제품의 최대 재고량을 검색하는 SQL문을 작성하라.
+SELECT MAX (재고량) FROM 제품;
+
+--8. 주문된 제품의 종류를 검색하는 SQL문을 작성하라.
+SELECT 제품.설명
+FROM 제품
+LEFT OUTER JOIN 주문내역 ON 제품.제품번호 = 주문내역.제품번호;
+
+SELECT 제품.설명
+FROM 제품, 주문내역
+where 제품.제품번호 = 주문내역.제품번호;
+
+
+
+--9. 고객번호'c101'의 고객 주문 내역을 고객번호, 제품번호, 주문수량 목록으로 검색하는 SQL문을 작성하라.
+SELECT 주문.고객번호, 주문내역.제품번호, 주문내역.수량
+FROM 주문
+LEFT OUTER JOIN 주문내역 ON 주문.주문번호 = 주문내역.주문번호;
+
